@@ -64,9 +64,6 @@ class Tagger:
         """
         
         total_time_start = time.time() # keep track of time
-        pct_step = int(100 / Tagger.test_cycles) # cycle steps in pct
-        test_pct = pct_step # percentage of the corpus to test the tagger on
-        train_pct = 100 - test_pct # percentage of the corpus to train the tagger on
         rights = [] # array to hold number of correctly-tagged words for each test
         wrongs = [] # array to hold number of incorrectly-tagged words for each test
         totals = [] # array to hold number of total words for each test
@@ -80,6 +77,7 @@ class Tagger:
 
         # returns untagged sentences
         testing_tagged_sents = self.testing.tagged_sents
+
         testing_untagged_sents = self.testing.sents
 
         testing_sents = (testing_untagged_sents, testing_tagged_sents)

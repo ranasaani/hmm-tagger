@@ -251,12 +251,12 @@ class HMM:
                     try:
 
                         guess_index = self.all_pos_tags.index(guess_tag)
+
+                        did_guess = True
+                        guess_count += 1
                     except ValueError as e:
                         guess_index=None
 
-                    did_guess = True
-                    guess_count += 1
-                    
                 # get a smoothed column of scores for scores[j]
                 scores = self._smooth_values(scores, j_value=j, \
                     guess_index=guess_index)
