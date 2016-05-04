@@ -19,7 +19,7 @@ class Treebank:
         msg("Importing treebank...")
         
         # get a corpus reader object for our corpus using NLTK
-        treebank = TaggedCorpusReader(corpus_path, corpus_files)
+        treebank = TaggedCorpusReader(corpus_path, corpus_files, sep="|")
         
         # get all sentences from corpus in a tagged format
         self.tagged_sents = treebank.tagged_sents()
@@ -42,7 +42,7 @@ class Treebank:
         msg("Getting training sentences...")
         sents = self._sents_by_pct(train_pct, start_train_pct)
         msg("done: %d%% starting at %d%%\n" % (train_pct, start_train_pct))
-        
+
         return sents
         
     def testing_sents(self, test_pct, start_test_pct):
@@ -88,6 +88,8 @@ class Treebank:
     ######### `PRIVATE' FUNCTIONS #########
     
     def _sents_by_pct(self, pct, start_pct, tagged=True):
+
+
         """
         Retrieve a percentage of sentences from the corpus
         
@@ -126,6 +128,7 @@ class Treebank:
         return self._sents_by_range(tb_sents, first_sent_index, last_sent_index)
         
     def _sents_by_range(self, tb_sents, first_sent_index, last_sent_index):
+
         """
         Retreive a subset of a list of sentences based on index range
         
@@ -145,4 +148,4 @@ class Treebank:
         else:
             sents = tb_sents[first_sent_index:last_sent_index+1]
             
-        return sents        
+        return sents

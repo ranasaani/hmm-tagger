@@ -22,9 +22,9 @@ class Tagger:
     mistake_threshold = 50
     
     # x-fold cross-validation
-    test_cycles = 10
+    test_cycles = 2
     
-    def __init__(self, corpus_path, corpus_files):
+    def __init__(self, corpus_path, corpus_files, test_files):
         """
         Construct a Tagger object
         
@@ -32,9 +32,12 @@ class Tagger:
         :param corpus_files: list of corpus files
         """
         
-        # object for working with corpus data
-        self.tb = Treebank(corpus_path, corpus_files) 
-        
+        # object for working with training data
+        self.training = Treebank(corpus_path, corpus_files)
+
+        # object for working with testing data
+        self.testing = Treebank(corpus_path, test_files)
+
         # will contain a list of tags in training corpus
         self.pos_tags = False 
         
@@ -68,37 +71,33 @@ class Tagger:
         wrongs = [] # array to hold number of incorrectly-tagged words for each test
         totals = [] # array to hold number of total words for each test
         all_missed = [] # array to hold incorrect tag information for each test
-        sep = ''.join(["-" for i in range(50)]) + "\n" # logging separator
-        
-        # loop from 0-90 (step size 10)
-        for start_train_pct in [x*pct_step for x in range(Tagger.test_cycles)]:
-            msg("%sSTARTING TEST CYCLE %d\n%s" % (sep, (start_train_pct/pct_step)+1,\
-                sep))
-            
-            # find the percent point to start collecting test sentences
-            # may be > 100, so circle round
-            start_test_pct = (start_train_pct+train_pct) % 100
-            
-            # train the tagger on sentences from the corpus matching our range
-            training_sents = self.tb.training_sents(train_pct,start_train_pct)
-            self.train(training_sents)
-            
-            # test the tagger on the rest of the sentences
-            testing_sents = self.tb.testing_sents(test_pct,start_test_pct)
-            (right, wrong, missed) = self.test(testing_sents)
-            
-            # gather accuracy statistics for this test
-            total = right + wrong
-            rights.append(right) # store the correct count for this test cycle
-            wrongs.append(wrong) # store the incorrect count for this test cycle
-            totals.append(total) # store the total words tested for this test cycle
-            all_missed += missed # add incorrect tag information from this cycle
-            
-            msg("Total words: %d\n" % total)
-            msg("Correct tags: %d (%0.2f%%)\n" % (right, right / total * 100))
-            msg("Incorrect tags: %d (%0.2f%%)\n" % (wrong, wrong / total * 100))
-        # end: test cycle
-            
+        sep = ''.join(["-" for i in range(50)]) + "\n" # logging s
+
+        # returns tagged sentences
+        training_sents = self.training.tagged_sents
+
+        self.train(training_sents)
+
+        # returns untagged sentences
+        testing_tagged_sents = self.testing.tagged_sents
+        testing_untagged_sents = self.testing.sents
+
+        testing_sents = (testing_untagged_sents, testing_tagged_sents)
+
+
+        (right, wrong, missed) = self.test(testing_sents)
+
+        # gather accuracy statistics for this test
+        total = right + wrong
+        rights.append(right) # store the correct count for this test cycle
+        wrongs.append(wrong) # store the incorrect count for this test cycle
+        totals.append(total) # store the total words tested for this test cycle
+        all_missed += missed # add incorrect tag information from this cycle
+
+        msg("Total words: %d\n" % total)
+        msg("Correct tags: %d (%0.2f%%)\n" % (right, right / total * 100))
+        msg("Incorrect tags: %d (%0.2f%%)\n" % (wrong, wrong / total * 100))
+
         msg("%s%s" % (sep,sep))
         
         # calculate and output statistics for the entire test
@@ -120,7 +119,7 @@ class Tagger:
         """
         
         # collect POS tags from our corpus
-        self.pos_tags = self.tb.pos_tags()
+        self.pos_tags = self.training.pos_tags()
         
         # add start markers to help with bigram tagging
         msg("Adjusting POS tags...")

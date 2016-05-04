@@ -248,7 +248,12 @@ class HMM:
                 # weights the guessed POS highest
                 else:
                     # determine the index of the guessed POS tag
-                    guess_index = self.all_pos_tags.index(guess_tag)
+                    try:
+
+                        guess_index = self.all_pos_tags.index(guess_tag)
+                    except ValueError as e:
+                        guess_index=None
+
                     did_guess = True
                     guess_count += 1
                     

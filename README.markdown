@@ -5,6 +5,4 @@ This is a [Part of Speech](http://en.wikipedia.org/wiki/Part-of-speech_tagging) 
 
 Usage
 ---
-    python hmm-tagger.py [--clean]
-
-Pass in the --clean option to clean a Treebank file before running the tagger. This can be time consuming, so you can leave it off during future runs.
+    python hmm-tagger.py
